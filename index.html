@@ -1,202 +1,625 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Gerenciador de Tarefas</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Chart.js para gráficos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Manifest para PWA -->
-    <link rel="manifest" href="manifest.json">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Minhas Tarefas — Dark Cyan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
     <style>
+        :root {
+            --bg-1: #0a0a0a;
+            --bg-2: #111213;
+            --card: #0f1718;
+            --cyan: #00ccff;
+            --accent: #ffb74d;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-2: rgba(0, 204, 255, 0.06);
+            --muted: rgba(255, 255, 255, 0.12);
+            --success: #2ecc71;
+            color-scheme: dark;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
         body {
-            /* Fundo com tom tecnológico + padrão sutil (data-URI SVG) */
-            background-color: #051023; /* fallback */
-            background-image:
-                linear-gradient(135deg, #071428 0%, #062f3b 50%, #07324a 100%),
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ccircle cx='12' cy='12' r='1.5' fill='%23ffffff' fill-opacity='0.05'/%3E%3Ccircle cx='60' cy='60' r='1.5' fill='%23ffffff' fill-opacity='0.03'/%3E%3Cpath d='M6 30h18M30 6v18' stroke='%23ffffff' stroke-opacity='0.03' stroke-width='1'/%3E%3Cpath d='M90 100h18M100 90v18' stroke='%23ffffff' stroke-opacity='0.03' stroke-width='1'/%3E%3Crect x='80' y='10' width='24' height='18' rx='2' fill='%23ffffff' fill-opacity='0.015'/%3E%3Cpath d='M84 14h6M84 18h12' stroke='%23ffffff' stroke-opacity='0.02' stroke-width='1'/%3E%3C/svg%3E");
-            background-repeat: repeat;
-            background-attachment: fixed;
-            color: #e6f7ff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100%;
+            margin: 0;
+            font-family: 'Space Grotesk', sans-serif, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+            color: #e6f7fb
         }
 
-        .task-card {
-            border-left: 4px solid #007bff;
-            margin-bottom: 10px;
+        .app {
+            max-width: 1200px;
+            margin: 28px auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 24px
         }
 
-        .task-card.análise {
-            border-left-color: #28a745;
+        header {
+            grid-column: 1/-1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between
         }
 
-        .task-card.estudos {
-            border-left-color: #ffc107;
+        h1 {
+            font-size: 42px;
+            margin: 0;
+            color: var(--cyan);
+            text-shadow: 0 6px 18px rgba(0, 204, 255, 0.08)
         }
 
-        .task-card.consultas {
-            border-left-color: #dc3545;
+        p.sub {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 14px
         }
 
-        .overdue {
-            background-color: #ffebee;
-            border-left-color: #f44336 !important;
+        /* stats row */
+        .row {
+            display: flex;
+            gap: 16px;
+            margin-top: 18px;
+            flex-wrap: wrap
         }
 
-        .dashboard {
-            /* Leve translucidez para combinar com o fundo tecnológico */
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
+        .stat {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.06));
+            padding: 18px;
+            border-radius: 14px;
+            min-width: 150px;
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.6), 0 0 28px rgba(0, 204, 255, 0.04) inset;
+            border: 1px solid rgba(255, 255, 255, 0.03)
+        }
+
+        .stat .num {
+            font-weight: 700;
+            color: var(--cyan);
+            font-size: 26px
+        }
+
+        .board {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.04));
+            padding: 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6)
+        }
+
+        /* timeline */
+        .timeline {
+            padding: 18px;
+            border-radius: 14px;
+            margin-top: 16px
+        }
+
+        .day-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px
+        }
+
+        .day-title {
+            font-weight: 700;
+            font-size: 18px
+        }
+
+        .time-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .hour {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start
+        }
+
+        .hour .label {
+            width: 64px;
+            font-size: 14px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .slot {
+            flex: 1;
+            padding: 12px;
             border-radius: 10px;
-            box-shadow: 0 6px 20px rgba(2, 6, 23, 0.6);
-            backdrop-filter: blur(6px);
-            border: 1px solid rgba(255,255,255,0.04);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.012), rgba(0, 0, 0, 0.06));
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            min-height: 56px;
+            position: relative
         }
 
-        /* Ajuste geral para cards para melhor contraste */
-        .card, .card .card-body {
-            background: rgba(255,255,255,0.04);
-            color: #e6f7ff;
-            border: 1px solid rgba(255,255,255,0.03);
+        .task {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, rgba(0, 204, 255, 0.02), rgba(0, 0, 0, 0.02));
+            border: 1px solid rgba(255, 255, 255, 0.02)
         }
-        /* Container menor para o gráfico (donut) */
-        .chart-sm {
-            width: 140px;
-            height: 140px;
-            margin: 0 auto;
+
+        .task .meta {
+            display: flex;
+            gap: 8px;
+            align-items: center
         }
-        .chart-sm canvas {
-            width: 100% !important;
-            height: 100% !important;
-            display: block;
+
+        .chip {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.03)
+        }
+
+        .btn {
+            background: var(--cyan);
+            color: #022;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 0 6px 18px rgba(0, 204, 255, 0.06)
+        }
+
+        button.ghost {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--cyan);
+            padding: 8px 12px;
+            border-radius: 10px
+        }
+
+        /* form */
+        .form {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        input,
+        select,
+        textarea {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 10px;
+            border-radius: 8px;
+            color: inherit
+        }
+
+        /* badges */
+        .badges {
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .badge {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.01), rgba(0, 0, 0, 0.03));
+            border: 1px solid rgba(255, 255, 255, 0.02)
+        }
+
+        .badge.locked {
+            opacity: 0.25;
+            filter: grayscale(40%)
+        }
+
+        /* stats panel */
+        .side {
+            display: flex;
+            flex-direction: column;
+            gap: 18px
+        }
+
+        .card {
+            padding: 18px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(0, 0, 0, 0.04));
+            border: 1px solid rgba(255, 255, 255, 0.03)
+        }
+
+        footer {
+            grid-column: 1/-1;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 20px
+        }
+
+        /* responsive */
+        @media(max-width:980px) {
+            .app {
+                grid-template-columns: 1fr;
+                padding: 16px
+            }
+
+            .side {
+                order: 2
+            }
+        }
+
+        /* small animations */
+        .fade {
+            transition: all .28s cubic-bezier(.2, .9, .2, 1)
+        }
+
+        .glow {
+            box-shadow: 0 8px 40px rgba(0, 204, 255, 0.08)
         }
     </style>
 </head>
 
 <body>
-    <div class="container mt-4">
-        <h1 class="text-center mb-4">Meu Gerenciador de Tarefas</h1>
-
-        <!-- Formulário para adicionar tarefa -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5>Adicionar Nova Tarefa</h5>
-                <form id="taskForm">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" id="taskTitle" placeholder="Descrição da tarefa"
-                                required>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" id="taskCategory" required>
-                                <option value="">Categoria</option>
-                                <option value="atendimento">Atendimento</option>
-                                <option value="análise">Análise</option>
-                                <option value="estudos">Estudos</option>
-                                <option value="consultas">Consultas BD</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <input type="datetime-local" class="form-control" id="taskDeadline">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-2">Adicionar Tarefa</button>
-                </form>
+    <div class="app">
+        <header>
+            <div>
+                <h1>Minhas Tarefas</h1>
+                <p class="sub">Organize seu dia e conquiste seus objetivos</p>
             </div>
-        </div>
-
-        <!-- Dashboard de Progresso -->
-        <div class="dashboard mb-4">
-            <h5>Progresso Diário/Semanal</h5>
-            <div class="d-flex justify-content-end mb-2">
-                <button id="exportBtn" class="btn btn-outline-light btn-sm me-2">Exportar</button>
-                <button id="importBtn" class="btn btn-outline-light btn-sm me-2">Importar</button>
-                <input type="file" id="importFile" accept="application/json" style="display:none" />
+            <div style="display:flex;gap:10px;align-items:center">
+                <button id="addBtn" class="btn">+</button>
             </div>
+        </header>
+
+        <main>
             <div class="row">
-                <div class="col-md-6">
-                    <p>Tarefas Concluídas Hoje: <span id="dailyProgress">0</span>/Total</p>
-                    <p>Tarefas Concluídas na Semana: <span id="weeklyProgress">0</span>/Total</p>
+                <div class="stat board">
+                    <div>Pontos Hoje</div>
+                    <div class="num" id="todayPoints">0</div>
                 </div>
-                <div class="col-md-6">
-                    <div class="chart-sm">
-                        <canvas id="progressChart"></canvas>
+                <div class="stat board">
+                    <div>Completadas</div>
+                    <div class="num" id="todayDone">0</div>
+                </div>
+                <div class="stat board">
+                    <div>Sequência</div>
+                    <div class="num" id="streak">0 dias</div>
+                </div>
+                <div class="stat board">
+                    <div>Badges</div>
+                    <div class="num" id="badgesCount">0/5</div>
+                </div>
+            </div>
+
+            <section class="board timeline" id="timelineBoard">
+                <div class="day-nav">
+                    <button class="ghost" id="prevDay">◀</button>
+                    <div style="text-align:center">
+                        <div class="day-title" id="dayTitle">Hoje</div>
+                        <div style="font-size:13px;color:var(--muted)" id="daySub">Clique no + para adicionar</div>
+                    </div>
+                    <button class="ghost" id="nextDay">▶</button>
+                </div>
+
+                <div class="time-grid" id="timeGrid"></div>
+            </section>
+
+            <section style="margin-top:16px" class="board">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <strong>Histórico Diário</strong>
+                    <small style="color:var(--muted)" id="historySummary">Últimos 7 dias</small>
+                </div>
+                <div id="historyList" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
+            </section>
+
+        </main>
+
+        <aside class="side">
+            <div class="card">
+                <strong>Estatísticas (últimos 7 dias)</strong>
+                <div style="display:flex;justify-content:space-between;margin-top:12px">
+                    <div>
+                        <div style="font-size:12px;color:var(--muted)">Total de pontos</div>
+                        <div id="weekPoints" style="font-weight:700;font-size:20px">0</div>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;color:var(--muted)">Tarefas concluídas</div>
+                        <div id="weekDone" style="font-weight:700;font-size:20px">0</div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Pomodoro / Foco do Dia -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5>Foco do Dia (Pomodoro)</h5>
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <label for="focusTaskSelect" class="form-label">Escolher tarefa para foco</label>
-                        <select id="focusTaskSelect" class="form-select">
-                            <option value="">— Selecionar tarefa —</option>
-                        </select>
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" id="completeOnFinish">
-                            <label class="form-check-label" for="completeOnFinish">Marcar tarefa como concluída ao finalizar o ciclo</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6 text-center">
-                        <div style="font-family: monospace; font-size: 42px;" id="focusTimer">25:00</div>
-                        <div class="small text-muted" id="focusMode">Modo: Pomodoro</div>
-                        <div class="mt-2">
-                            <button id="focusStart" class="btn btn-success btn-sm me-2">Iniciar</button>
-                            <button id="focusPause" class="btn btn-secondary btn-sm me-2">Pausar</button>
-                            <button id="focusReset" class="btn btn-outline-light btn-sm">Reset</button>
-                        </div>
-                        <div class="mt-2 small">Sessões completas hoje: <span id="focusSessions">0</span></div>
-                    </div>
+            <div class="card">
+                <strong>Conquistas</strong>
+                <div class="badges" id="badgesList" style="margin-top:12px"></div>
+            </div>
+
+            <div class="card">
+                <strong>Adicionar / Editar Tarefa</strong>
+                <form id="taskForm" class="form" style="margin-top:10px">
+                    <input id="taskTitle" placeholder="Título" required style="flex:1" />
+                    <select id="taskCategory" required>
+                        <option value="water">💧 Beber Água (10 pts)</option>
+                        <option value="study">📚 Estudar (30 pts)</option>
+                        <option value="train">💪 Treinar (25 pts)</option>
+                        <option value="work">💼 Trabalho (20 pts)</option>
+                        <option value="other">⚡ Outro (10 pts)</option>
+                    </select>
+                </form>
+                <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+                    <input type="time" id="taskTime" value="07:00" style="width:120px" />
+                    <button id="saveTask" class="btn">Salvar</button>
                 </div>
             </div>
-        </div>
 
-        <!-- Lista de Tarefas -->
-        <div class="card">
-            <div class="card-body">
-                <h5>Minhas Tarefas</h5>
-                <div id="statusRegion" aria-live="polite" class="visually-hidden"></div>
-                <!-- Busca e filtros -->
-                <div class="row mb-3 g-2 align-items-center">
-                    <div class="col-md-6">
-                        <input id="taskSearch" type="search" class="form-control" placeholder="Buscar tarefas...">
-                    </div>
-                    <div class="col-md-3">
-                        <select id="filterCategory" class="form-select">
-                            <option value="">Todas as categorias</option>
-                            <option value="atendimento">Atendimento</option>
-                            <option value="análise">Análise</option>
-                            <option value="estudos">Estudos</option>
-                            <option value="consultas">Consultas BD</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <select id="filterStatus" class="form-select">
-                            <option value="">Todos</option>
-                            <option value="completed">Concluídas</option>
-                            <option value="pending">Pendentes</option>
-                        </select>
-                    </div>
-                    <div class="col-md-1 text-end">
-                        <button id="clearFilters" class="btn btn-outline-light btn-sm" title="Limpar filtros">Limpar</button>
-                    </div>
-                </div>
+        </aside>
 
-                <ul class="list-group" id="taskList" role="list"></ul>
-            </div>
-        </div>
+        <footer>Feito com ♥ — Design escuro cyan. Backup automático via localStorage.</footer>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="app.js"></script> <!-- Seu JS aqui -->
+    <script>
+        // --- Data structures and constants
+        const categories = {
+            water: { label: 'Beber Água', pts: 10, icon: '💧' },
+            study: { label: 'Estudar', pts: 30, icon: '📚' },
+            train: { label: 'Treinar', pts: 25, icon: '💪' },
+            work: { label: 'Trabalho', pts: 20, icon: '💼' },
+            other: { label: 'Outro', pts: 10, icon: '⚡' }
+        }
+        const badgesMeta = [
+            { id: 'first', title: 'Primeira Tarefa', desc: 'Complete sua primeira tarefa', unlock: (s) => s.totalTasksDone >= 1 },
+            { id: 'warrior', title: 'Guerreiro da Semana', desc: '7 dias consecutivos', unlock: (s) => s.streak >= 7 },
+            { id: 'master', title: 'Mestre das Tarefas', desc: 'Complete 50 tarefas', unlock: (s) => s.totalTasksDone >= 50 },
+            { id: 'club100', title: 'Clube dos 100', desc: 'Complete 100 tarefas', unlock: (s) => s.totalTasksDone >= 100 },
+            { id: 'king', title: 'Rei dos Pontos', desc: 'Acumule 500 pontos', unlock: (s) => s.totalPoints >= 500 }
+        ]
+
+        // --- storage
+        const STORAGE_KEY = 'taskmaster_v1'
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY)
+                return raw ? JSON.parse(raw) : { tasks: {}, meta: { badges: [], totalTasksDone: 0, totalPoints: 0 } }
+            } catch (e) { console.error(e); return { tasks: {}, meta: { badges: [], totalTasksDone: 0, totalPoints: 0 } } }
+        }
+        function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)) }
+
+        let state = loadState()
+
+        // --- utilities
+        function yyyymmdd(d) { const t = new Date(d); t.setHours(0, 0, 0, 0); return t.toISOString().slice(0, 10) }
+        function fmtDateLabel(dateStr) { const d = new Date(dateStr); const opts = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }; return d.toLocaleDateString('pt-BR', opts) }
+        function parseTimeToHourMinute(str) { const [h, m] = str.split(':').map(Number); return { h, m } }
+
+        // current view date
+        let viewDate = new Date()
+
+        // DOM refs
+        const timeGrid = document.getElementById('timeGrid')
+        const dayTitle = document.getElementById('dayTitle')
+        const daySub = document.getElementById('daySub')
+        const todayPoints = document.getElementById('todayPoints')
+        const todayDone = document.getElementById('todayDone')
+        const prevDay = document.getElementById('prevDay')
+        const nextDay = document.getElementById('nextDay')
+        const addBtn = document.getElementById('addBtn')
+        const taskForm = document.getElementById('taskForm')
+        const taskTitle = document.getElementById('taskTitle')
+        const taskCategory = document.getElementById('taskCategory')
+        const taskTime = document.getElementById('taskTime')
+        const saveTask = document.getElementById('saveTask')
+        const historyList = document.getElementById('historyList')
+        const weekPointsEl = document.getElementById('weekPoints')
+        const weekDoneEl = document.getElementById('weekDone')
+        const badgesList = document.getElementById('badgesList')
+        const badgesCount = document.getElementById('badgesCount')
+        const streakEl = document.getElementById('streak')
+
+        // form state for editing
+        let editId = null
+
+        // --- render timeline
+        function renderTimeGrid() {
+            timeGrid.innerHTML = ''
+            const dateKey = yyyymmdd(viewDate)
+            const tasksForDay = state.tasks[dateKey] || []
+            dayTitle.textContent = (yyyymmdd(viewDate) === yyyymmdd(new Date())) ? 'Hoje' : fmtDateLabel(dateKey)
+            daySub.textContent = dateKey
+            for (let hour = 6; hour <= 23; hour++) {
+                const hr = document.createElement('div'); hr.className = 'hour fade'
+                const label = document.createElement('div'); label.className = 'label'; label.textContent = (hour < 10 ? '0' + hour : hour) + ':00'
+                const slot = document.createElement('div'); slot.className = 'slot'
+                // find tasks in that hour
+                const items = tasksForDay.filter(t => Number(t.time.split(':')[0]) === hour).sort((a, b) => a.time.localeCompare(b.time))
+                if (items.length === 0) {
+                    slot.innerHTML = `<div style="color:var(--muted);font-size:13px">—</div>`
+                } else {
+                    items.forEach(t => {
+                        const el = document.createElement('div'); el.className = 'task'
+                        const left = document.createElement('div'); left.className = 'meta'
+                        const chk = document.createElement('input'); chk.type = 'checkbox'; chk.checked = !!t.done; chk.addEventListener('change', () => toggleDone(dateKey, t.id, chk.checked))
+                        const txt = document.createElement('div'); txt.innerHTML = `<div style="font-weight:700">${t.title}</div><div style="font-size:12px;color:var(--muted)">${categories[t.category].icon} ${categories[t.category].label} · ${categories[t.category].pts} pts</div>`
+                        left.appendChild(chk); left.appendChild(txt)
+                        const right = document.createElement('div'); right.style.display = 'flex'; right.style.alignItems = 'center'; right.style.gap = '8px'
+                        const timeSpan = document.createElement('div'); timeSpan.className = 'chip'; timeSpan.textContent = t.time
+                        const del = document.createElement('button'); del.className = 'ghost'; del.textContent = '🗑'; del.addEventListener('click', () => deleteTask(dateKey, t.id))
+                        right.appendChild(timeSpan); right.appendChild(del)
+                        el.appendChild(left); el.appendChild(right)
+                        slot.appendChild(el)
+                    })
+                }
+                hr.appendChild(label); hr.appendChild(slot)
+                timeGrid.appendChild(hr)
+            }
+            updateSummaryForDay(dateKey)
+        }
+
+        function updateSummaryForDay(dateKey) {
+            const tasksForDay = state.tasks[dateKey] || []
+            const done = tasksForDay.filter(t => t.done)
+            const pts = done.reduce((s, t) => s + categories[t.category].pts, 0)
+            todayPoints.textContent = pts
+            todayDone.textContent = `${done.length}/${tasksForDay.length}`
+        }
+
+        // --- tasks operations
+        function addTaskToDay(dateKey, task) {
+            state.tasks[dateKey] = state.tasks[dateKey] || []
+            state.tasks[dateKey].push(task)
+            saveState(); renderEverything()
+        }
+        function deleteTask(dateKey, id) {
+            state.tasks[dateKey] = (state.tasks[dateKey] || []).filter(t => t.id !== id)
+            saveState(); renderEverything()
+        }
+        function toggleDone(dateKey, id, done) {
+            const arr = state.tasks[dateKey] || []
+            const t = arr.find(x => x.id === id)
+            if (!t) return
+            if (done && !t.done) {
+                t.done = true; state.meta.totalTasksDone = (state.meta.totalTasksDone || 0) + 1; state.meta.totalPoints = (state.meta.totalPoints || 0) + categories[t.category].pts
+            } else if (!done && t.done) {
+                t.done = false; state.meta.totalTasksDone = (state.meta.totalTasksDone || 0) - 1; state.meta.totalPoints = (state.meta.totalPoints || 0) - categories[t.category].pts
+            }
+            saveState(); renderEverything()
+        }
+
+        // --- create id
+        function idShort() { return Math.random().toString(36).slice(2, 9) }
+
+        // --- compute stats for last 7 days
+        function lastNDays(n, fromDate = new Date()) { const res = []; for (let i = 0; i < n; i++) { const d = new Date(fromDate); d.setDate(fromDate.getDate() - i); res.push(yyyymmdd(d)) } return res }
+        function computeWeekStats() {
+            const days = lastNDays(7, viewDate)
+            let pts = 0, done = 0
+            days.forEach(k => {
+                const arr = state.tasks[k] || []
+                arr.filter(t => t.done).forEach(t => { pts += categories[t.category].pts; done++ })
+            })
+            return { pts, done }
+        }
+
+        // --- history list
+        function renderHistory() {
+            historyList.innerHTML = ''
+            const days = lastNDays(7, viewDate)
+            days.forEach(k => {
+                const arr = state.tasks[k] || []
+                const done = arr.filter(t => t.done)
+                const el = document.createElement('div'); el.className = 'badge fade'; if (done.length === 0) el.classList.add('locked')
+                el.innerHTML = `<div><strong>${(new Date(k)).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })}</strong><div style='font-size:12px;color:var(--muted)'>${arr.length} tarefas</div></div><div style='text-align:right'><div style='font-weight:700'>${done.reduce((s, t) => s + categories[t.category].pts, 0)} pts</div><div style='font-size:12px;color:var(--muted)'>${done.length}/${arr.length}</div></div>`
+                el.addEventListener('click', () => { viewDate = new Date(k); renderEverything() })
+                historyList.appendChild(el)
+            })
+        }
+
+        // --- badges
+        function evaluateBadges() {
+            const s = { streak: computeStreak(), totalTasksDone: state.meta.totalTasksDone || 0, totalPoints: state.meta.totalPoints || 0 }
+            const unlocked = []
+            badgesMeta.forEach(b => { if (b.unlock(s)) unlocked.push(b.id) })
+            state.meta.badges = unlocked
+            saveState()
+            renderBadges(unlocked)
+        }
+        function renderBadges(unlocked) {
+            badgesList.innerHTML = ''
+            badgesMeta.forEach(b => {
+                const div = document.createElement('div'); div.className = 'badge ' + (unlocked.includes(b.id) ? '' : 'locked')
+                div.innerHTML = `<div><strong>${b.title}</strong><div style='font-size:12px;color:var(--muted)'>${b.desc}</div></div><div>${unlocked.includes(b.id) ? '✔' : '⏳'}</div>`
+                badgesList.appendChild(div)
+            })
+            badgesCount.textContent = `${unlocked.length}/${badgesMeta.length}`
+        }
+
+        // --- streak: consecutive days with at least one completed task
+        function computeStreak() {
+            const todayKey = yyyymmdd(new Date())
+            let streak = 0
+            let cur = new Date()
+            while (true) {
+                const key = yyyymmdd(cur)
+                const done = (state.tasks[key] || []).some(t => t.done)
+                if (done) { streak++; cur.setDate(cur.getDate() - 1) } else break
+            }
+            return streak
+        }
+
+        // --- global render
+        function renderEverything() {
+            renderTimeGrid(); renderHistory();
+            const week = computeWeekStats(); weekPointsEl.textContent = week.pts; weekDoneEl.textContent = week.done
+            evaluateBadges()
+            streakEl.textContent = computeStreak() + ' dias'
+            // update meta summary
+            todayPoints.classList.add('glow'); setTimeout(() => todayPoints.classList.remove('glow'), 350)
+        }
+
+        // --- handlers
+        prevDay.addEventListener('click', () => { viewDate.setDate(viewDate.getDate() - 1); renderEverything() })
+        nextDay.addEventListener('click', () => { viewDate.setDate(viewDate.getDate() + 1); renderEverything() })
+        addBtn.addEventListener('click', () => { taskTitle.focus(); editId = null })
+
+        saveTask.addEventListener('click', () => {
+            const title = taskTitle.value.trim(); if (!title) return alert('Insira um título')
+            const category = taskCategory.value
+            const timeVal = taskTime.value || '07:00'
+            const dateKey = yyyymmdd(viewDate)
+            if (editId) {
+                const t = (state.tasks[dateKey] || []).find(x => x.id === editId)
+                if (t) { t.title = title; t.category = category; t.time = timeVal }
+            } else {
+                const task = { id: idShort(), title, category, time: timeVal, done: false }
+                addTaskToDay(dateKey, task)
+            }
+            taskTitle.value = ''; saveState(); renderEverything()
+        })
+
+        // allow clicking on a timeline slot to quickly add at hour
+        timeGrid.addEventListener('click', e => {
+            const slot = e.target.closest('.hour')
+            if (!slot) return
+            const label = slot.querySelector('.label').textContent
+            const h = label.split(':')[0]
+            taskTime.value = (h.length === 1 ? '0' + h : h) + ':00'
+            taskTitle.focus()
+        })
+
+        // initialize: ensure meta fields exist
+        state.meta = state.meta || { badges: [], totalTasksDone: 0, totalPoints: 0 }
+
+        // When loading, we need to compute totals from existing tasks (in case not tracked)
+        function recomputeTotals() {
+            let tdone = 0, tpoints = 0
+            Object.values(state.tasks).flat().forEach(t => { if (t.done) { tdone++; tpoints += categories[t.category].pts } })
+            state.meta.totalTasksDone = tdone
+            state.meta.totalPoints = tpoints
+            saveState()
+        }
+        recomputeTotals()
+
+        // autosave periodically
+        setInterval(() => saveState(), 2000)
+
+        // first render
+        renderEverything()
+
+        // expose for debugging
+        window._tm = { state, saveState, renderEverything }
+    </script>
 </body>
 
 </html>
