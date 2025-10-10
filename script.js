@@ -1,3 +1,6 @@
+// script.js
+
+// Constantes
 const TASK_CATEGORIES = {
     water: { label: 'Beber Água', points: 10, icon: 'fas fa-tint' },
     study: { label: 'Estudar', points: 30, icon: 'fas fa-book-open' },
