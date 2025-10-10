@@ -1,13 +1,196 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Minhas Tarefas - Organize seu dia e conquiste seus objetivos</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minhas Tarefas - Organize seu dia e conquiste seus objetivos</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+  <div class="min-h-screen gradient-bg font-space-grotesk text-white particle-bg relative">
+    <div class="container mx-auto px-4 py-8 relative z-10">
+      <!-- Header -->
+      <div class="text-center mb-8 animate-slide-up">
+        <h1 class="text-5xl font-bold gradient-text mb-2 floating">Minhas Tarefas</h1>
+        <p class="text-muted-foreground text-lg animate-pulse-slow">Organize seu dia e conquiste seus objetivos</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="card glass-morphism hover:neon-border transition-all duration-300 animate-bounce-in">
+          <div class="card-content p-4">
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-chart-bar h-5 w-5 text-primary animate-pulse"></i>
+              <div>
+                <p class="text-sm text-muted-foreground">Pontos Hoje</p>
+                <p class="text-2xl font-bold text-primary animate-glow" id="today-points">0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass-morphism hover:neon-border transition-all duration-300 animate-bounce-in"
+          style="animation-delay: 0.1s;">
+          <div class="card-content p-4">
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-check-circle h-5 w-5 text-primary animate-pulse"></i>
+              <div>
+                <p class="text-sm text-muted-foreground">Completadas</p>
+                <p class="text-2xl font-bold text-primary" id="completed-tasks">0/0</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass-morphism hover:neon-border transition-all duration-300 animate-bounce-in"
+          style="animation-delay: 0.2s;">
+          <div class="card-content p-4">
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-fire h-5 w-5 text-orange-500 animate-pulse"></i>
+              <div>
+                <p class="text-sm text-muted-foreground">Sequência</p>
+                <p class="text-2xl font-bold text-orange-500" id="streak">0 dias</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass-morphism hover:neon-border transition-all duration-300 animate-bounce-in"
+          style="animation-delay: 0.3s;">
+          <div class="card-content p-4">
+            <div class="flex items-center space-x-2">
+              <i class="fas fa-trophy h-5 w-5 text-yellow-500 animate-pulse"></i>
+              <div>
+                <p class="text-sm text-muted-foreground">Badges</p>
+                <p class="text-2xl font-bold text-yellow-500" id="earned-badges">0/5</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Timeline Principal -->
+        <div class="lg:col-span-2">
+          <div class="card glass-morphism neon-border animate-slide-up">
+            <div class="card-header">
+              <div class="flex items-center justify-between">
+                <button class="btn-icon" id="prev-day"><i class="fas fa-chevron-left"></i></button>
+                <h2 class="text-xl font-bold" id="current-date">Sexta-Feira, 10 de Outubro de 2025</h2>
+                <button class="btn-icon" id="next-day"><i class="fas fa-chevron-right"></i></button>
+              </div>
+              <p class="text-center text-sm text-muted-foreground" id="today-label">Hoje</p>
+            </div>
+            <div class="card-content p-4" id="task-timeline">
+              <!-- Tasks will be rendered here -->
+              <div class="text-center text-muted-foreground py-8">
+                <i class="fas fa-clock text-4xl mb-4"></i>
+                <p>Nenhuma tarefa para este dia</p>
+                <p>Clique no + para adicionar</p>
+              </div>
+            </div>
+            <div class="card-footer p-4">
+              <button
+                class="btn-add-task w-full mt-4 animate-glow bg-gradient-to-r from-primary to-blue-500 hover:from-blue-500 hover:to-primary transition-all duration-300">
+                <i class="fas fa-plus h-4 w-4 mr-2 animate-spin"></i>
+                Adicionar Tarefa
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar com Estatísticas e Badges -->
+        <div class="space-y-6">
+          <!-- Estatísticas -->
+          <div class="card glass-morphism neon-border animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="card-header">
+              <h3 class="card-title flex items-center space-x-2">
+                <i class="fas fa-chart-bar h-5 w-5 text-primary"></i>
+                Estatísticas
+              </h3>
+            </div>
+            <div class="card-content p-4">
+              <p class="text-sm text-muted-foreground mb-2">Últimos 7 dias</p>
+              <div class="flex justify-around text-center mb-4">
+                <div>
+                  <p class="text-xl font-bold text-primary" id="total-points-7-days">0</p>
+                  <p class="text-sm text-muted-foreground">Total de pontos</p>
+                </div>
+                <div>
+                  <p class="text-xl font-bold text-primary" id="total-tasks-7-days">0</p>
+                  <p class="text-sm text-muted-foreground">Tarefas concluídas</p>
+                </div>
+              </div>
+              <h4 class="font-bold mb-2">Histórico Diário</h4>
+              <ul id="daily-history">
+                <!-- Daily history will be rendered here -->
+              </ul>
+            </div>
+          </div>
+
+          <!-- Badges -->
+          <div class="card glass-morphism neon-border animate-slide-up" style="animation-delay: 0.4s;">
+            <div class="card-header">
+              <h3 class="card-title flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <i class="fas fa-trophy h-5 w-5 text-yellow-500"></i>
+                  Conquistas
+                </div>
+                <span class="text-sm text-muted-foreground" id="badges-count">0/5</span>
+              </h3>
+            </div>
+            <div class="card-content p-4" id="badges-list">
+              <!-- Badges will be rendered here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Task Modal -->
+  <div id="add-task-modal" class="modal hidden">
+    <div class="modal-content glass-morphism neon-border animate-bounce-in">
+      <div class="modal-header">
+        <h2 class="modal-title text-primary">Nova Tarefa</h2>
+        <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="task-title">Título da Tarefa</label>
+          <input type="text" id="task-title" placeholder="Ex: Beber 2L de água">
+        </div>
+        <div class="form-group">
+          <label for="task-category">Categoria</label>
+          <select id="task-category">
+            <option value="water">💧 Beber Água (10 pts )</option>
+            <option value="study">📚 Estudar (30 pts)</option>
+            <option value="train">💪 Treinar (25 pts)</option>
+            <option value="work">💼 Trabalho (20 pts)</option>
+            <option value="other">⚡ Outro (10 pts)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="task-time">Horário</label>
+          <input type="time" id="task-time" value="09:00">
+        </div>
+        <div class="form-group">
+          <label>Pontos</label>
+          <input type="text" id="task-points" value="10" readonly>
+        </div>
+        <button
+          class="btn-create-task w-full animate-glow bg-gradient-to-r from-primary to-blue-500 hover:from-blue-500 hover:to-primary transition-all duration-300">
+          Criar Tarefa
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
 </html>
