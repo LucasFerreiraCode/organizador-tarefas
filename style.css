@@ -739,3 +739,54 @@ body {
         grid-column: span 2 / span 2;
     }
 }
+
+/* Pequenos utilitários faltantes usados pelo script (não alteram visual) */
+.p-3 { padding: 0.75rem; }
+.space-x-3 > *:not([hidden]) ~ *:not([hidden]) { margin-left: 0.75rem; }
+
+/* Ajustes para alinhar a lista de badges/conquistas */
+#badges-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+#badges-list > div {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* espaço entre ícone e texto */
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+}
+
+/* garantir que título do badge e descrição fiquem alinhados verticalmente */
+#badges-list h4, #badges-list p { margin: 0; }
+
+/* Se houver um header no card de badges, mantê-lo alinhado e com espaçamento entre ícone e texto */
+.card .card-body > .card-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem; /* espaço entre elementos do título (ícone + texto + contador) */
+}
+
+/* Se o título incluir um ícone (ex: troféu), separar o ícone do texto */
+.card .card-body > .card-title i {
+    margin-right: 0.5rem;
+    flex: 0 0 auto;
+}
+
+/* Também aplicar espaçamento caso o ícone seja SVG */
+.card .card-body > .card-title svg {
+    margin-right: 0.5rem;
+    flex: 0 0 auto;
+}
+
+/* Se o ícone for um emoji no início do texto, usar ::first-letter para espaçar visualmente */
+.card .card-body > .card-title::first-letter {
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+/* Pequeno ajuste responsivo para evitar que o ícone quebre linha em telas pequenas */
+#badges-list i { flex: 0 0 auto; }
